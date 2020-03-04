@@ -1,0 +1,149 @@
+---
+title: "Caret Realtors "
+author: "Leila Rayyan & Tanner Asmussen"
+date: "03/05/2020"
+output: 
+  prettydoc::html_pretty:
+    theme: leonids
+    
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(caret)
+```
+
+
+
+# Let Us Help You Find the Right Neighborhood in the Sacramento Area Using Caret 
+
+<center>
+![](house.jpg){#id .class width=200% height=150%}
+</center>
+
+## First, Meet our Realtor Team!
+<center>
+![Leila Rayyan](leila_headshot.jpeg){#id .class width=40% height=40%} ![Tanner Asmussen](tanner_headshot.jpeg){#id .class width=45% height=35%}
+</center>
+We have been diligently working with Caret to create the best model to predict the optimal neighborhood for you and your family based on your housing preferences! 
+Let us walk you through what Caret is, and then we will show you the magic behind our top-notch predictive model! 
+
+#### *Voted best real estate predictive model of 2020!*
+
+## Caret Package Overview
+<center>
+![](caret.jpg)
+</center>
+
+The **C**lassification **A**nd **RE**gression **T**raining package, known colloquially as **‘CARET’**, is a swiss army knife toolset for all things Machine Learning.  The package contains a number of streamlining functions for data splitting, pre-processing, feature selection, model tuning using resampling, and variable importance estimation.   While there exists no shortage of machine learning programs and functions throughout the codeverse, caret is unique in its uniform interface of these functions as simplification of common ML tasks.  To that end, caret streamlines the start-up and usage process by limiting load-in requirements with respect to the number of “suggested” packages that are integral to any ML package iteration.
+
+### History of Caret
+Caret was first published in 2007 by Max Kuhn, who has continually updated to the present.  Currently a Lead Software Engineer with RStudio, Kuhn created the package while he was with the R&D department at Pfizer Global.  The intention of the package, in his words, were:
+
+* To eliminate syntactical differences between many of the functions for building and predicting models;
+* To develop a set of semi-automated, reasonable approaches for optimizing the values of the tuning parameters for many of these models; and 
+* To create a package that can easily be extended to parallel processing systems. Since then, the package has been continually updated to include new regression models and data science best practices, incorporate new packages as they develop, and otherwise maintain functionality. The most recent update, *version 6.0-85*, was published on January 7th, 2020 to primarily correct syntax and function misspellings.  
+
+### Usage and Dependency
+One of the major benefits of caret insofar as a complex Machine Learning training program is that it is written to minimize computing power.  To that end, the only two packages that caret depends on are **lattice** and **ggplot2**, both of which provide effective visualization interfaces. There are a multitude of other suggested packages including **dplyr**, **RANN**, and **Knitr**; however as needed those are called without having to import the entirety of each library.   
+
+## Similar Packages
+
+### Dplyr vs. Caret
+[Dplyr](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) is one of the most syntactically functionable data processing packages.  It allows the user to easily investigate and develop an understanding for the data that they are working with.  Likewise, it is effective in manipulating, releveling, cleaning, and preparing data for advanced analysis.  Caret, although more effective in pre-processing data, lacks the functionality for the initial cleaning and preparing phase of the Machine Learning Process.  In that same light, however, Dplyr does not have the capacity to automate centering and scaling processes as Caret can.  Thus, the two are best used in tandem to facilitate those initial steps.  
+ 
+### mlr3 vs. Caret
+[mlr3](https://cran.r-project.org/web/packages/mlr3/mlr3.pdf) or
+Machine Learning in R - Next Generation is a similar, object-oriented programming package aimed to facilitate scalable machine learning building blocks.  It contains a number of functions for all types of regressions, measures, and resampling strategies similar to Caret.  One unique and particularly impactful feature within mlr3 is its potential for parallelization of learning models, as the functions are encoded to allow easy nested resampling.  Caret, however, does provide a more comprehensive and interconnected function set as far as the pre-processing and data-splitting.
+ 
+### Caret vs. Base R
+While [Caret](http://topepo.github.io/caret/index.html) provides enhanced functionality and streamlined pre-processing to model tuning process, it is important to note that Machine Learning at its core is possible exclusive of facilitating packages.  Base R itself is capable of running learning algorithms in the same manner as Caret and other packages, however the streamlined nature of caret allows for fewer lines of complicated code.
+
+
+## How We Can Help You
+### *Using Caret to Predict Neighborhood Based on Housing Characteristics*
+
+#### The Data
+The data we use is the Sacramento House Price Data in the caret package. It includes information on 932 homes in the Sacramento, California area reported over a 5-day period. 
+The variables in this data set include: city, zip-code, number of beds in the house, number of baths, square foot of house, type of house, price, latitiude, and longitude. 
+Since city, zip-code, latitude, and longitude are redundant data points, we have only included the city parameter in our final model.
+
+Below, we load in the data set, subset out the columns we want to use, and create a correlation plot to see if any variables are correlated with eachoter. 
+```{r, warning=FALSE, message=FALSE, error=FALSE}
+data("Sacramento")
+data = Sacramento[,c(1,3:7)] 
+correlation = cor(data[,c(2,3,4,6)])
+corrplot::corrplot(correlation) 
+#Square foot of the house has biggest correlation with price, 
+#and a similarly large correlation with the other quantitative 
+#variables as well. 
+
+```
+
+#### Clean Your Data
+For categorical data, it is useful to turn those columns into dummy variables for proper modeling. Caret streamlines this process for you with the easy dummyVars funtion shown below.
+We will not use the dummy variables created below for our final model. The following data is just for show.
+```{r, warning=FALSE, message=FALSE, error=FALSE}
+dummy = dummyVars(price~., data) 
+#In this example, we are using Price as the response variavle. 
+#The period refers to all other variables in the data frame. 
+#In this case, they are all categorical variables, 
+#and can be converted to dummy variables. 
+data2 = predict(dummy, newdata=data) 
+#This creates a new dataset with dummy variables only. 
+#Note: it takes out Price. 
+```
+
+#### Split Your Data
+In good model-building fashion, we must split our data into training and testing subsets. We have decided to spilt the data into an 80/20 training to testing ratio. Meaning that 80% of the data will be used to train the model and 20% of the data will be used to test our model. 
+Caret's `createDataPartition()` function will randomly divide your dataset using any proportion you want (p=0.8 for us, in this case). 
+We set the seed for reproducible results. 
+```{r pressure, warning=FALSE, message=FALSE, error=FALSE}
+set.seed(8)
+trainIndex = createDataPartition(data$city, p=0.8, list=FALSE)
+training = data[trainIndex,]
+testing = data[-trainIndex,]
+```
+
+#### Train Your Model
+We trained our data using the intuitive `train()` function in Caret based on linear discriminant analysis. 
+Our goal is to train our model to predict the a neighborhood based on the housing characteristics we give it like number of beds, baths, square-footage, and price. 
+```{r,warning=FALSE, message=FALSE, error=FALSE, eval=FALSE}
+model = train(city~., data=training, method="lda")
+```
+
+#### Predict the Outcomes
+To gather our model's predictions based on our testing data, we use the `predict()` function and input our model and testing data we separated above.
+```{r,warning=FALSE, message=FALSE, error=FALSE, eval=FALSE}
+preds = predict(model, newdata=testing)
+```
+
+#### Testing the Accuracy of the Model
+To see how our model performed in predictions, we have created this confusion matrix. 
+It will give us an accuracy score to signify how many predictions our model got right. 
+
+```{r,warning=FALSE, message=FALSE, error=FALSE, eval=FALSE}
+confusionMatrix(preds, testing$city)
+```
+
+While our accuracy is relatively low at around %52, we are still confident in successfully finding the right neigborhood for you!
+
+
+## Reflection of Caret
+
+**Caret** is generally considered to be the pioneering and preeminent Machine Learning package for R.  First created over a decade ago and continuously updated, Caret has adapted to new methodology and practices of machine learning in a cohesive and interconnected manner.  Although it is unable to investigate and manipulate data at the level of dplyr or other data manipulation packages, it allows for user flexibility throughout the model application process.  Likewise, with caret’s heightened functionality insofar as the number of available models **(over 200)** in its train function,  one can easily try different models to find the most fitting one for the data.
+
+However, Caret is only as good as your data set and your ability to understand what it requires to create a useable model. 
+We are confident in ourselves, and that is why we took it upon outselves to use Caret to make a model for you!
+
+If you like what you have seen so far, give us a call, email, or come visit us in our office! We can help you find the *best* house for you.
+
+## Contact Us
+
+* Tel: (568) 895-6649
+* Email: help@caretrealtors.com
+* Or visit us at:
+  + 123 Caret Way, Sacramento, CA 12345
+
+
