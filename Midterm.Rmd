@@ -119,6 +119,19 @@ To gather our model's predictions based on our testing data, we use the `predict
 preds = predict(model, newdata=testing)
 ```
 
+#### Now Tell Us What You Want!
+Fill in the new data set with the housing information you want, and our model will tell you where to live!
+```{r,warning=FALSE, message=FALSE, error=FALSE, eval=TRUE}
+model = train(city~., data=training, method="lda")
+beds = 6
+baths = 5
+sqft = 25000
+type = "Multi_Family"
+price = 150000
+testdata = data.frame(beds, baths, sqft, type,price)
+predict(model, newdata=testdata)
+```
+
 #### Testing the Accuracy of the Model
 To see how our model performed in predictions, we have created this confusion matrix. 
 It will give us an accuracy score to signify how many predictions our model got right. 
@@ -127,7 +140,7 @@ It will give us an accuracy score to signify how many predictions our model got 
 confusionMatrix(preds, testing$city)
 ```
 
-While our accuracy is relatively low at around %52, we are still confident in successfully finding the right neigborhood for you!
+While our accuracy is relatively low at around 52%, we are still confident in successfully finding the right neigborhood for you!
 
 
 ## Reflection of Caret
